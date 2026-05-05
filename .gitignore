@@ -1,10 +1,12 @@
-# Python-generated files
+# Python files
 __pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
+*.py[cod]
 
-# Virtual environments
-.venv
+# Data & Backups (Keep your music list private)
+collection_export.xml
+collection_vibe_updated.xml
+backup_*.xml
+
+# Environment
+.venv/
+env/
