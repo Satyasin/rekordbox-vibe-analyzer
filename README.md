@@ -5,32 +5,37 @@ An intelligent Python-based utility designed to automate the metadata enrichment
 ---
 
 ## 🛑 The Problem Statement
-Managing a large DJ library makes manual tagging nearly impossible. Standard software provides BPM and Key, but fails to quantify the **"vibe"**—the energy flux, the rhythmic complexity (swing), and the sonic brightness. Without these metrics, DJs spend more time scrolling and less time transitioning creatively.
+Managing a large DJ library makes manual tagging nearly impossible. Standard software provides BPM and Key, but fails to quantify the **"vibe"**—the energy flux, the journey of the track, and the sonic brightness. Without these metrics, DJs spend more time scrolling and less time transitioning creatively.
 
 ## 🚀 What the Tool Does
-The Analyzer parses a Rekordbox XML export, analyzes each audio file using the `Librosa` library, and calculates three custom metrics:
-1.  **Energy Swing:** Detects rhythmic "groove" vs. "straight" beats.
-2.  **Spectral Brightness:** Identifies "dark" underground tracks vs. "bright" mainstage tracks.
-3.  **Vibe Score:** A composite metric that identifies the track's functional role in a set.
+The Analyzer parses a Rekordbox XML export, analyzes each audio file using the `Librosa` library, and calculates three essential metrics:
+1.  **Energy (E):** Overall intensity and power levels.
+2.  **Brightness (B):** High-frequency presence and "air" in the mix.
+3.  **Energy Range / Swing (S):** Categorizes the "journey" or "drama" of the track's energy levels.
 
 ## 🧠 How it Works
 The script follows a 4-step pipeline:
 *   **Parsing:** Reads the `collection.xml` to locate track file paths.
-*   **DSP Analysis:** Uses Fast Fourier Transforms (FFT) to analyze Spectral Rolloff and Onset Strength.
-*   **Scaling:** Normalizes values to a 1–10 scale for easy reading.
-*   **XML Injection:** Writes the new data back into the `Comment` or `Color` fields of a new XML file.
+*   **DSP Analysis:** Uses Fast Fourier Transforms (FFT) to analyze Spectral Rolloff and Energy Variance.
+*   **Scaling:** Normalizes Energy and Brightness to a 0.00–1.00 scale.
+*   **Classification:** Maps the Energy Range into three distinct performance categories (L, B, D).
 
 ---
 
 ## 📊 How to Read the Output
 The tool outputs a specialized string into the **Comment** field:
-`[E: 8.2 | B: 4.5 | S: 6.0]`
+`[E: 0.93 | B: 0.57 | S: L]`
 
-| Metric | Meaning | High Value (8-10) | Low Value (1-3) |
+| Metric | Type | What it represents | Example Values |
 | :--- | :--- | :--- | :--- |
-| **Energy (E)** | Intensity | Peak-hour Techno/Trance | Ambient/Chill-out |
-| **Brightness (B)** | High Frequencies | Crisp Hi-hats/Synths | Muddy/Deep/Dubby |
-| **Swing (S)** | Rhythmic Groove | Organic House/Jazz-swing | Industrial/Straight 4x4 |
+| **Energy (E)** | 0.00 – 1.00 | Overall intensity and power. | **0.95** (Peak) \| **0.20** (Chill) |
+| **Brightness (B)** | 0.00 – 1.00 | High-frequency presence. | **0.85** (Crisp) \| **0.30** (Deep) |
+| **Swing (S)** | **Category** | The "Energy Journey" of the track. | **L, B, or D** |
+
+### **Decoding Energy Journey (S) Categories**
+*   **S:L (Linear/Steady):** Range < 0.15. Consistent energy throughout. These are your "tools" and loop-friendly tracks.
+*   **S:B (Building/Journey):** Range 0.15 - 0.35. Standard tracks that evolve and grow from intro to drop.
+*   **S:D (Dramatic/Peak):** Range > 0.35. High-impact tracks with massive builds or high contrast between sections.
 
 ---
 
@@ -38,24 +43,25 @@ The tool outputs a specialized string into the **Comment** field:
 ### **Benefits**
 *   **Consistency:** Eliminates subjective "mood" tagging.
 *   **Speed:** Processes bulk libraries faster than manual auditioning.
-*   **Discovery:** Find hidden gems with high energy in your older folders.
+*   **Precision:** Uses a 0.00-1.00 scale for granular library sorting.
 
 ### **Lacunas (Things to check)**
-*   **CPU Intensive:** Analyzing 6,000+ tracks can take significant time; run in batches.
-*   **File Paths:** Ensure your Rekordbox XML export uses absolute file paths.
-*   **Genre Bias:** A "bright" Techno track may still be "darker" than a "bright" Pop track.
+*   **CPU Intensive:** Analyzing large libraries (6,000+ tracks) is heavy; run in batches.
+*   **Privacy:** Ensure you do not upload your actual `.xml` data files to public repositories.
+*   **File Paths:** Requires local absolute file paths within the XML to locate audio files.
 
 ---
 
 ## 🛠 How to Use
+
 ### 1. Generate XML
-In Rekordbox, go to **File -> Export Collection in xml format**. Save it as `collection_export.xml`.
+In Rekordbox, go to **File -> Export Collection in xml format**. Save it as `collection_export.xml` in the project root.
 
 ### 2. Run the Script
-This project uses **uv** for high-performance dependency management. You can run the analyzer with a single command:
+This project uses **uv** for high-performance dependency management. Run the analyzer with:
 
 ```bash
-# Install dependencies and run the script
+# Install dependencies and run the script automatically
 uv run vibe_batch.py
 ```
 ### **3. Import back to Rekordbox**
@@ -68,14 +74,17 @@ In the tree view (left panel), click the XML icon.
 
 Right-click the tracks and select Import to Collection. Your comments will now be updated!
 
-🔮 Future Functionalities
+
+**🔮 Future Functionalities**
+
 **Camelot Key Auto-Correction:** Verification of Rekordbox key detection.
 
 **Vocal Detection:** Flagging tracks as "Instrumental" vs "Vocal".
 
 **Auto-Playlist Generation:** Creating "Vibe Playlists" based on Energy/Swing thresholds.
 
-💬 Feedback
+
+**💬 Feedback**
 This is an evolving project by a DJ/Product Manager. If you find edge cases where the energy detection feels "off," please open an Issue or reach out. Your feedback helps refine the DSP logic!
 
-Developed by Satyajeet Aparadh (Satyasin)
+**Developed by Satyajeet Aparadh (Satyasin)**
