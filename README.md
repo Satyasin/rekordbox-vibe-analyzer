@@ -40,21 +40,23 @@ Ensure you have `uv` installed for high-performance dependency management.
 curl -LsSf [https://astral.sh/uv/install.sh](https://astral.sh/uv/install.sh) | sh
 ```
 ### 2. Configure Your Database Path (Required)
+
 For safety and path-transparency, you must explicitly point the script to your Rekordbox database.
-1. Open vibe_batch.py in a text editor.
 
-2. Locate the variable REKORDBOX_DB_PATH.
+Open vibe_batch.py in a text editor.
 
-3. Replace the placeholder with your actual path.
+Locate the variable REKORDBOX_DB_PATH.
 
-**Reference for macOS:** /Users/YOUR_USERNAME/Library/Pioneer/rekordbox/master.db
+Replace the placeholder with your actual path.
+
+Reference for macOS: /Users/YOUR_USERNAME/Library/Pioneer/rekordbox/master.db
 
 ### 3. Export Your Collection
 
 In Rekordbox, go to File > Export Collection in xml format. Save it as collection_export.xml in the project root folder.
 
 ## 📖 Usage Instructions
-**Phase 1: Analyze & Review**
+### Phase 1: Analyze & Review
 
 Run the analyzer on a specific playlist:
 
@@ -63,35 +65,31 @@ uv run vibe_batch.py -p "Your Playlist Name"
 ```
 **Database Backup:** A copy of your master.db is moved to /db_backups.
 
-**Interactive UI:** A browser window opens at http://127.0.0.1:5000. Review suggestions, adjust sliders, and click Confirm & Save.
+**Interactive UI:** A browser window opens at http://127.0.0.1:5000. Review suggestions, adjust sliders, and click Confirm & Save All.
+<img width="1413" height="686" alt="Screenshot 2026-05-05 at 5 20 10 PM" src="https://github.com/user-attachments/assets/e3fbae2f-37de-41df-882b-2d9efab7659a" />
+
+
 
 **Lockdown:** Once saved, the UI becomes read-only to ensure data integrity.
 
+<img width="1413" height="686" alt="Screenshot 2026-05-05 at 5 33 18 PM" src="https://github.com/user-attachments/assets/ed4c7d48-3cca-4c37-9714-9cd54974e5c6" />
+
+
 Return to your terminal and press Ctrl+C to stop the server.
 
-**Phase 2: Generate & Import**
+### Phase 2: Generate & Import
 
 ```Bash
 uv run vibe_batch.py --generate
 ```
-
 **Final Output:** A fresh XML is created in /vibe_outputs.
 
 **Import:** In Rekordbox, go to File > Import > Import Playlist and select your new file.
 
-**Commit:** Right-click the tracks in the new playlist and select Import to Collection.
+**Commit:** Right-click the tracks in the new playlist and select Import to Collection. Your comments will now be updated with the [E: | B: | S:] tags.
+<img width="640" height="177" alt="Screenshot 2026-05-05 at 5 34 08 PM" src="https://github.com/user-attachments/assets/3bc7dead-ff22-416d-b08e-06fc0071cf20" />
 
-## 🖼️ User Interface Reference
-Review and edit Energy and Brightness
 
-Finalize and save
-
-## 🤝 Contributing & Feedback
-This is an evolving project developed at the intersection of product management and music production.
-
-**Feedback:** If the DSP logic feels "off" for specific genres, please open an issue.
-
-**Future Features:** Vocal Detection, Camelot Key Verification, and Auto-Playlist Generation are currently in the roadmap.
 
 ## 🔒 Security & Data Privacy
 **Zero-Cloud Footprint:** All analysis and the Review Dashboard run locally. No track data or metadata is ever uploaded to an external server.
@@ -100,4 +98,4 @@ This is an evolving project developed at the intersection of product management 
 
 **Database Safety:** The mandatory backup process ensures your original master.db remains untouched in the /db_backups folder.
 
-**Developed by Satyajeet Aparadh (Satyasin)**
+Developed by Satyajeet Aparadh (Satyasin)
