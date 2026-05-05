@@ -1,0 +1,12 @@
+# Python files
+__pycache__/
+*.py[cod]
+
+# Data & Backups (Keep your music list private)
+collection_export.xml
+collection_vibe_updated.xml
+backup_*.xml
+
+# Environment
+.venv/
+env/
