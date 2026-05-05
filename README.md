@@ -52,10 +52,11 @@ The tool outputs a specialized string into the **Comment** field:
 In Rekordbox, go to **File -> Export Collection in xml format**. Save it as `collection_export.xml`.
 
 ### 2. Run the Script
-Ensure you have the requirements installed:
+This project uses **uv** for high-performance dependency management. You can run the analyzer with a single command:
+
 ```bash
-pip install -r requirements.txt
-python vibe_batch.py
+# Install dependencies and run the script
+uv run vibe_batch.py
 ```
 ### **3. Import back to Rekordbox**
 
