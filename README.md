@@ -56,7 +56,7 @@ Ensure you have the requirements installed:
 ```bash
 pip install -r requirements.txt
 python vibe_batch.py
-
+```
 ### **3. Import back to Rekordbox**
 
 The script will generate collection_vibe_updated.xml.
