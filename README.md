@@ -1,36 +1,29 @@
-# Rekordbox Vibe Analyzer v3.0
+# DJ Intelligence Pro: Vibe Analyzer v5.5 🎧
 
-An intelligent Python-based utility designed to automate the metadata enrichment of Rekordbox libraries. This tool uses Digital Signal Processing (DSP) to analyze track characteristics that standard software often misses.
+**DJ Intelligence Pro** is a "Human-in-the-Loop" metadata enrichment utility designed for Rekordbox power users. It bridges the gap between raw Digital Signal Processing (DSP) and a DJ’s intuition, allowing you to batch-analyze tracks and manually verify the results through a custom web interface before updating your library.
 
 ---
 
 ## 🛑 The Problem Statement
 Managing a large DJ library makes manual tagging nearly impossible. Standard software provides BPM and Key, but fails to quantify the **"vibe"**—the energy flux, the journey of the track, and the sonic brightness. Without these metrics, DJs spend more time scrolling and less time transitioning creatively.
 
-## 🚀 What the Tool Does
-The Analyzer parses a Rekordbox XML export, analyzes each audio file using the `Librosa` library, and calculates three essential metrics:
-1.  **Energy (E):** Overall intensity and power levels.
-2.  **Brightness (B):** High-frequency presence and "air" in the mix.
-3.  **Energy Range / Swing (S):** Categorizes the "journey" or "drama" of the track's energy levels.
-
-## 🧠 How it Works
-The script follows a 4-step pipeline:
-*   **Parsing:** Reads the `collection.xml` to locate track file paths.
-*   **DSP Analysis:** Uses Fast Fourier Transforms (FFT) to analyze Spectral Rolloff and Energy Variance.
-*   **Scaling:** Normalizes Energy and Brightness to a 0.00–1.00 scale.
-*   **Classification:** Maps the Energy Range into three distinct performance categories (L, B, D).
+## 🚀 The "Human-in-the-Loop" Workflow
+Unlike automated tools that blindly overwrite data, this tool follows a **Review -> Refine -> Commit** pipeline:
+1. **Analysis:** The tool samples 4 distinct points of a track to calculate Energy, Brightness, and Swing.
+2. **Verification:** An interactive HTML dashboard allows you to "Accept" or "Skip" suggestions and manually tweak scores.
+3. **Safety:** Every run automatically triggers a timestamped backup of your Rekordbox `master.db`.
+4. **Integration:** Generates a non-destructive XML for a clean Rekordbox import.
 
 ---
 
-## 📊 How to Read the Output
-The tool outputs a specialized string into the **Comment** field:
-`[E: 0.93 | B: 0.57 | S: L]`
+## 🧠 The Metrics
+The tool analyzes track characteristics using the `Librosa` library across three primary dimensions:
 
 | Metric | Type | What it represents | Example Values |
 | :--- | :--- | :--- | :--- |
-| **Energy (E)** | 0.00 – 1.00 | Overall intensity and power. | **0.95** (Peak) \| **0.20** (Chill) |
-| **Brightness (B)** | 0.00 – 1.00 | High-frequency presence. | **0.85** (Crisp) \| **0.30** (Deep) |
-| **Swing (S)** | **Category** | The "Energy Journey" of the track. | **L, B, or D** |
+| **Energy (E)** | 0.00 – 1.00 | Overall intensity and power levels using weighted RMS. | **0.95** (Peak) \| **0.20** (Chill) |
+| **Brightness (B)** | 0.00 – 1.00 | High-frequency presence (Spectral Rolloff). | **0.85** (Crisp) \| **0.30** (Deep) |
+| **Swing (S)** | **Category** | The "Energy Journey" based on variance across the track. | **L, B, or D** |
 
 ### **Decoding Energy Journey (S) Categories**
 *   **S:L (Linear/Steady):** Range < 0.15. Consistent energy throughout. These are your "tools" and loop-friendly tracks.
@@ -39,52 +32,72 @@ The tool outputs a specialized string into the **Comment** field:
 
 ---
 
-## ✅ Benefits & Lacunas
-### **Benefits**
-*   **Consistency:** Eliminates subjective "mood" tagging.
-*   **Speed:** Processes bulk libraries faster than manual auditioning.
-*   **Precision:** Uses a 0.00-1.00 scale for granular library sorting.
+## 🛠️ Installation & Setup
 
-### **Lacunas (Things to check)**
-*   **CPU Intensive:** Analyzing large libraries (6,000+ tracks) is heavy; run in batches.
-*   **Privacy:** Ensure you do not upload your actual `.xml` data files to public repositories.
-*   **File Paths:** Requires local absolute file paths within the XML to locate audio files.
-
----
-
-## 🛠 How to Use
-
-### 1. Generate XML
-In Rekordbox, go to **File -> Export Collection in xml format**. Save it as `collection_export.xml` in the project root.
-
-### 2. Run the Script
-This project uses **uv** for high-performance dependency management. Run the analyzer with:
-
+### 1. Prerequisites
+Ensure you have `uv` installed for high-performance dependency management.
 ```bash
-# Install dependencies and run the script automatically
-uv run vibe_batch.py
+curl -LsSf [https://astral.sh/uv/install.sh](https://astral.sh/uv/install.sh) | sh
 ```
-### **3. Import back to Rekordbox**
+### 2. Configure Your Database Path (Required)
+For safety and path-transparency, you must explicitly point the script to your Rekordbox database.
+1. Open vibe_batch.py in a text editor.
 
-The script will generate collection_vibe_updated.xml.
+2. Locate the variable REKORDBOX_DB_PATH.
 
-In Rekordbox, go to Preferences -> View -> Layout and enable rekordbox xml.
+3. Replace the placeholder with your actual path.
 
-In the tree view (left panel), click the XML icon.
+**Reference for macOS:** /Users/YOUR_USERNAME/Library/Pioneer/rekordbox/master.db
 
-Right-click the tracks and select Import to Collection. Your comments will now be updated!
+### 3. Export Your Collection
 
+In Rekordbox, go to File > Export Collection in xml format. Save it as collection_export.xml in the project root folder.
 
-**🔮 Future Functionalities**
+## 📖 Usage Instructions
+**Phase 1: Analyze & Review**
 
-**Camelot Key Auto-Correction:** Verification of Rekordbox key detection.
+Run the analyzer on a specific playlist:
 
-**Vocal Detection:** Flagging tracks as "Instrumental" vs "Vocal".
+```Bash
+uv run vibe_batch.py -p "Your Playlist Name"
+```
+**Database Backup:** A copy of your master.db is moved to /db_backups.
 
-**Auto-Playlist Generation:** Creating "Vibe Playlists" based on Energy/Swing thresholds.
+**Interactive UI:** A browser window opens at http://127.0.0.1:5000. Review suggestions, adjust sliders, and click Confirm & Save.
 
+**Lockdown:** Once saved, the UI becomes read-only to ensure data integrity.
 
-**💬 Feedback**
-This is an evolving project by a DJ/Product Manager. If you find edge cases where the energy detection feels "off," please open an Issue or reach out. Your feedback helps refine the DSP logic!
+Return to your terminal and press Ctrl+C to stop the server.
+
+**Phase 2: Generate & Import**
+
+```Bash
+uv run vibe_batch.py --generate
+```
+
+**Final Output:** A fresh XML is created in /vibe_outputs.
+
+**Import:** In Rekordbox, go to File > Import > Import Playlist and select your new file.
+
+**Commit:** Right-click the tracks in the new playlist and select Import to Collection.
+
+## 🖼️ User Interface Reference
+Review and edit Energy and Brightness
+
+Finalize and save
+
+## 🤝 Contributing & Feedback
+This is an evolving project developed at the intersection of product management and music production.
+
+**Feedback:** If the DSP logic feels "off" for specific genres, please open an issue.
+
+**Future Features:** Vocal Detection, Camelot Key Verification, and Auto-Playlist Generation are currently in the roadmap.
+
+## 🔒 Security & Data Privacy
+**Zero-Cloud Footprint:** All analysis and the Review Dashboard run locally. No track data or metadata is ever uploaded to an external server.
+
+**.gitignore Protection:** The repository is pre-configured to block the uploading of .xml, .json, and .db files.
+
+**Database Safety:** The mandatory backup process ensures your original master.db remains untouched in the /db_backups folder.
 
 **Developed by Satyajeet Aparadh (Satyasin)**
