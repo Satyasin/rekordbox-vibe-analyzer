@@ -1,12 +1,15 @@
-# Python files
-__pycache__/
-*.py[cod]
+# Local Database & Backups
+db_backups/
+vibe_outputs/
+master.db
+vibe_edits.json
 
-# Data & Backups (Keep your music list private)
-collection_export.xml
-collection_vibe_updated.xml
-backup_*.xml
+# Rekordbox Exports (Don't share your music library data!)
+*.xml
 
-# Environment
+# Environment & Cache
 .venv/
-env/
+__pycache__/
+.DS_Store
+uv.lock
+.python-version

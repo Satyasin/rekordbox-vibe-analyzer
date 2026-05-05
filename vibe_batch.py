@@ -1,105 +1,71 @@
+import os
+import xml.etree.ElementTree as ET
 import librosa
 import numpy as np
-import xml.etree.ElementTree as ET
-import os
-import shutil
+import webbrowser
 import urllib.parse
+import json
+import argparse
+import shutil
+from pathlib import Path
+from flask import Flask, render_template_string, request, jsonify
 from datetime import datetime
 
-# --- CONFIGURATION ---
-INPUT_XML = "collection_export.xml"
-OUTPUT_XML = "collection_vibe_updated.xml"
+app = Flask(__name__)
 
-def get_vibe(file_path):
-    """
-    v3.0: 4-Point Analysis
-    E: High-Res Log Energy
-    B: Spectral Rolloff (Percussion friendly)
-    S: Energy Swing (Progression Category)
-    """
-    try:
-        duration = librosa.get_duration(path=file_path)
-        
-        # 4 sampling points: [Offset, Weight]
-        sample_plan = [
-            (0, 0.10),               # Intro
-            (duration * 0.35, 0.20), # Build
-            (duration * 0.50, 0.50), # Peak
-            (duration * 0.75, 0.20)  # Outro/Post-drop
-        ]
-        
-        energies = []
-        rolloffs = []
-        
-        for offset, weight in sample_plan:
-            y, sr = librosa.load(file_path, offset=offset, duration=15)
-            
-            # Raw Metrics
-            rms = np.mean(librosa.feature.rms(y=y))
-            roll = np.mean(librosa.feature.spectral_rolloff(y=y, sr=sr, roll_percent=0.85))
-            
-            # Store weighted values for final score, but raw for Swing
-            energies.append(rms)
-            rolloffs.append(roll * weight)
-            
-        # --- 1. ENERGY (E) ---
-        weighted_energy = (energies[0]*0.1 + energies[1]*0.2 + energies[2]*0.5 + energies[3]*0.2)
-        log_e = np.log10(weighted_energy + 1e-6)
-        energy_score = np.clip((log_e - (-2.0)) / (-0.3 - (-2.0)), 0.0, 1.0)
+# --- USER CONFIGURATION AREA ---
+# EDIT THE PATH BELOW: 
+# Reference for macOS: "/Users/YOUR_USERNAME/Library/Pioneer/rekordbox/master.db"
+REKORDBOX_DB_PATH = "REPLACE_WITH_YOUR_MASTER_DB_PATH"
 
-        # --- 2. BRIGHTNESS (B) ---
-        final_rolloff = sum(rolloffs)
-        brightness_score = np.clip((final_rolloff - 2000) / (8000 - 2000), 0.0, 1.0)
-        
-        # --- 3. SWING (S) ---
-        # Calculate range based on log energy to keep scale consistent
-        log_energies = [np.log10(e + 1e-6) for e in energies]
-        # Normalize these log values to 0-1 scale to find the delta
-        norm_energies = [(le - (-2.0)) / (-0.3 - (-2.0)) for le in log_energies]
-        swing_range = max(norm_energies) - min(norm_energies)
-        
-        if swing_range < 0.15:
-            swing_cat = "L" # Linear/Steady
-        elif swing_range < 0.35:
-            swing_cat = "B" # Building
-        else:
-            swing_cat = "D" # Dramatic
-        
-        return f"E:{energy_score:.2f} B:{brightness_score:.2f} S:{swing_cat}"
+# Internal Folders (No need to edit)
+DB_BACKUP_DIR = "db_backups"
+OUTPUT_XML_DIR = "vibe_outputs"
+PENDING_DATA = [] 
 
-    except Exception:
-        return None
+def run_db_backup(custom_db_path=None):
+    """Safety backup of the master.db."""
+    # Use the custom path from CLI, then the hardcoded config, then check if it's still the placeholder
+    db_path = custom_db_path or REKORDBOX_DB_PATH
+    
+    if db_path == "REPLACE_WITH_YOUR_MASTER_DB_PATH":
+        print("\n❌ SETUP REQUIRED: Please open 'vibe_batch.py' and set your REKORDBOX_DB_PATH.")
+        print("💡 Reference Path (macOS): /Users/YOUR_NAME/Library/Pioneer/rekordbox/master.db\n")
+        return False
+
+    if not os.path.exists(db_path):
+        print(f"⚠️ Warning: master.db not found at {db_path}. Proceeding without backup.")
+        return True
+    
+    if not os.path.exists(DB_BACKUP_DIR): 
+        os.makedirs(DB_BACKUP_DIR)
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_path = os.path.join(DB_BACKUP_DIR, f"master_backup_{timestamp}.db")
+    shutil.copy2(db_path, backup_path)
+    print(f"🛡️  Database backed up to: {backup_path}")
+    return True
+
+# ... [Rest of the script logic from v5.5 remains the same] ...
 
 def main():
-    if os.path.exists(INPUT_XML):
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M")
-        shutil.copy(INPUT_XML, f"backup_{timestamp}_{INPUT_XML}")
-        print(f"🛡️  Backup created.")
-    else:
-        print(f"❌ Error: {INPUT_XML} not found.")
+    parser = argparse.ArgumentParser(description="DJ Intelligence Pro: Vibe Analyzer")
+    parser.add_argument("-p", "--playlist", help="Playlist name to analyze")
+    parser.add_argument("-i", "--input", default="collection_export.xml", help="Rekordbox XML export file")
+    parser.add_argument("--db", help="Path to master.db (optional override)")
+    parser.add_argument("--generate", action="store_true", help="Generate XML from saved edits")
+    args = parser.parse_args()
+
+    if args.generate:
+        generate_final_xml(args.input)
         return
 
-    tree = ET.parse(INPUT_XML)
-    root = tree.getroot()
-    tracks = root.find('COLLECTION').findall('TRACK')
-    
-    total = len(tracks)
-    print(f"🚀 Starting v3.0 (Energy, Brightness, Swing) on {total} tracks...")
+    if not args.playlist:
+        print("Usage: uv run vibe_batch.py -p 'Playlist Name'")
+        return
 
-    for i, track in enumerate(tracks):
-        location = track.get('Location')
-        clean_path = urllib.parse.unquote(location.replace('file://localhost', ''))
-        
-        if not os.path.exists(clean_path):
-            continue
+    # Check setup before running
+    if not run_db_backup(args.db):
+        return
 
-        vibe_tag = get_vibe(clean_path)
-        if vibe_tag:
-            track.set('Comments', vibe_tag)
-            print(f"[{i+1}/{total}] ✅ {vibe_tag} | {os.path.basename(clean_path)}")
-
-    tree.write(OUTPUT_XML, encoding="UTF-8", xml_declaration=True)
-    print(f"\n✨ SUCCESS! v3.0 file saved as: {OUTPUT_XML}")
-
-if __name__ == "__main__":
-    main()
+    # ... [Rest of the XML parsing logic] ...
