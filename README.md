@@ -23,12 +23,15 @@ The tool analyzes track characteristics using the `Librosa` library across three
 | :--- | :--- | :--- | :--- |
 | **Energy (E)** | 0.00 – 1.00 | Overall intensity and power levels using weighted RMS on a logarithmic scale to better mimic human perceived loudness. | **0.95** (Peak) \| **0.20** (Chill) |
 | **Brightness (B)** | 0.00 – 1.00 | High-frequency presence (Spectral Rolloff). | **0.85** (Crisp) \| **0.30** (Deep) |
-| **Swing (S)** | **Category** | The "Energy Journey" based on variance across the track. | **L, B, or D** |
+| **Swing (S)** | **Category** | Measures the dynamic range and energy evolution of a track. It identifies whether a track maintains a steady profile or contains dramatic shifts between its "intro/outro" and "peak" sections. | **L, B, or D** |
 
-### **Decoding Energy Journey (S) Categories**
-*   **S:L (Linear/Steady):** Range < 0.15. Consistent energy throughout. These are your "tools" and loop-friendly tracks.
-*   **S:B (Building/Journey):** Range 0.15 - 0.35. Standard tracks that evolve and grow from intro to drop.
-*   **S:D (Dramatic/Peak):** Range > 0.35. High-impact tracks with massive builds or high contrast between sections.
+### **Decoding Energy Journey / Swing (S) Categories**
+
+| Category |Technical Range | Energy Topology |DJ Use Case |
+| :--- | :--- | :--- | :--- |
+| **S:L (Linear)** | <0.15 | Flat Consistent: Minimal change in energy from start to finish. | "The Tool: Perfect for long, seamless transitions or layering under other tracks without volume/energy spikes.|
+| **S:B (Building)** | 0.15−0.35| Progression / Journey: A standard arc that evolves as the track progresses. |"The Storyteller: Your core set-builders. These tracks have a clear intro, development, and energy peak."|
+| **S:D (Dramatic)** |>0.35 | High-Contrast / Dynamic: Significant jumps between quiet breakdowns and high-energy drops.| "The Statement: High-impact tracks or ""Peak Time"" bombs. Use these for dramatic shifts or to reset the dancefloor energy."|
 
 ---
 
