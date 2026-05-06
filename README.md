@@ -93,7 +93,6 @@ uv run vibe_batch.py --generate
 <img width="640" height="177" alt="Screenshot 2026-05-05 at 5 34 08 PM" src="https://github.com/user-attachments/assets/3bc7dead-ff22-416d-b08e-06fc0071cf20" />
 
 ---
----
 ## **🧪 Verification & Testing**
 To ensure the Vibe Analyzer is calibrated correctly for your system, follow this three-step "Sanity Check."
 
@@ -132,7 +131,8 @@ After clicking "Confirm & Save All" in the browser:
 
 Open vibe_edits.json in your project folder.
 
-**Verify:** Ensure the JSON reflects your manual adjustments and that the track status is marked as "accept".
+****Verify:** Ensure the JSON reflects your manual adjustments and that the track status is marked as "accept".
+
 ---
 
 ## 🔒 Security & Data Privacy
