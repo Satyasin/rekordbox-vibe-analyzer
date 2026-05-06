@@ -92,7 +92,48 @@ uv run vibe_batch.py --generate
 **Commit:** Right-click the tracks in the new playlist and select Import to Collection. Your comments will now be updated with the [E: | B: | S:] tags.
 <img width="640" height="177" alt="Screenshot 2026-05-05 at 5 34 08 PM" src="https://github.com/user-attachments/assets/3bc7dead-ff22-416d-b08e-06fc0071cf20" />
 
+---
+---
+## **🧪 Verification & Testing**
+To ensure the Vibe Analyzer is calibrated correctly for your system, follow this three-step "Sanity Check."
 
+### 1. Basic Connectivity Test
+
+Run the script with the --help flag to verify that uv and all dependencies are installed correctly:
+
+```Bash
+uv run vibe_batch.py --help
+```
+**Success:** You see a list of available arguments (-p, --generate).
+
+### 2. The "Vibe Calibration" Run
+
+Choose three tracks from your library that represent the extreme ends of your sound:
+
+A Deep/Ambient Track: Expected Energy <0.30 | Swing: L
+
+A Standard Club Track: Expected Energy 0.50−0.75 | Swing: B
+
+A Peak-Time Banger: Expected Energy >0.85 | Swing: D
+
+**Run the analysis:**
+
+```Bash
+uv run vibe_batch.py -p "Test Playlist"
+```
+
+Verify Logarithmic Scaling: Does the energy feel representative of the perceived loudness (not just the waveform height)?
+
+Verify Swing Category: Does a steady track correctly show as S:L while a track with a massive drop shows as S:D?
+
+### 3. Integrity Check
+
+After clicking "Confirm & Save All" in the browser:
+
+Open vibe_edits.json in your project folder.
+
+**Verify:** Ensure the JSON reflects your manual adjustments and that the track status is marked as "accept".
+---
 
 ## 🔒 Security & Data Privacy
 **Zero-Cloud Footprint:** All analysis and the Review Dashboard run locally. No track data or metadata is ever uploaded to an external server.
