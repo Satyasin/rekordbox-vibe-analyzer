@@ -21,7 +21,7 @@ The tool analyzes track characteristics using the `Librosa` library across three
 
 | Metric | Type | What it represents | Example Values |
 | :--- | :--- | :--- | :--- |
-| **Energy (E)** | 0.00 – 1.00 | Overall intensity and power levels using weighted RMS. | **0.95** (Peak) \| **0.20** (Chill) |
+| **Energy (E)** | 0.00 – 1.00 | Overall intensity and power levels using weighted RMS on a logarithmic scale to better mimic human perceived loudness. | **0.95** (Peak) \| **0.20** (Chill) |
 | **Brightness (B)** | 0.00 – 1.00 | High-frequency presence (Spectral Rolloff). | **0.85** (Crisp) \| **0.30** (Deep) |
 | **Swing (S)** | **Category** | The "Energy Journey" based on variance across the track. | **L, B, or D** |
 
